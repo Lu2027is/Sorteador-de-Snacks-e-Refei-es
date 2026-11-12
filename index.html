@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O Que Comer? - Sorteador de Snacks e Refeições</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #181824, #0f0f17);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: #1e1e2f;
+      width: 100%;
+      max-width: 550px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      border: 1px solid #2d2d44;
+      text-align: center;
+    }
+
+    h1 {
+      color: #fbbf24;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+
+    /* Filtros de Categoria */
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background-color: #2d2d44;
+      color: #cbd5e1;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background-color: #f59e0b;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    /* Cartão do Resultado */
+    .food-card {
+      background-color: #161622;
+      border: 2px dashed #3f3f5a;
+      border-radius: 15px;
+      padding: 30px 20px;
+      margin-bottom: 30px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .food-card.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .food-emoji {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+    }
+
+    .food-name {
+      font-size: 1.5rem;
+      color: #f8fafc;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .food-desc {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+
+    /* Botão Principal */
+    .btn-sortear {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      transition: transform 0.2s, background 0.3s;
+      width: 100%;
+    }
+
+    .btn-sortear:hover {
+      transform: scale(1.03);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+
+    .btn-sortear:active {
+      transform: scale(0.98);
+    }
+
+    /* Animação de tremor do cartão */
+    @keyframes shake {
+      0% { transform: translateY(0); }
+      25% { transform: translateY(-8px) rotate(-1deg); }
+      50% { transform: translateY(8px) rotate(1deg); }
+      75% { transform: translateY(-4px); }
+      100% { transform: translateY(0); }
+    }
+
+    footer {
+      margin-top: 25px;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🍔 O Que Comer Hoje?</h1>
+    <p class="subtitle">Deixa a sorte decidir o teu próximo snack ou refeição!</p>
+
+    <!-- Botões de Categoria -->
+    <div class="filters">
+      <button class="filter-btn active" onclick="setCategory('all', this)">Tudo</button>
+      <button class="filter-btn" onclick="setCategory('snack', this)">🍿 Snacks Rápidos</button>
+      <button class="filter-btn" onclick="setCategory('jantar', this)">🍕 Jantar / Refeição</button>
+      <button class="filter-btn" onclick="setCategory('doce', this)">🍫 Doces & Sobremesas</button> pipas
+    </div>
+
+    <!-- Cartão onde sai a comida -->
+    <div class="food-card" id="foodCard">
+      <div class="food-emoji" id="foodEmoji">🤔</div>
+      <div class="food-name" id="foodName">Clica no botão para sortear!</div>
+      <div class="food-desc" id="foodDesc">A nossa roleta gastronómica está pronta.</div>
+    </div>
+
+    <!-- Botão de Ação -->
+    <button class="btn-sortear" onclick="sortearComida()">✨ Sortear Comida!</button>
+  </div>
+
+  <footer>
+    <p>Criado com criatividade para resolver o dilema da fome.</p>
+  </footer>
+
+  <script>
+    // Lista de opções de comida com categorias, emojis e descrições
+    const foods = [
+      { name: "Pipocas de Micro-ondas", category: "snack", emoji: "🍿", desc: "Quentinhas, amanteigadas e prontas em 3 minutos." },
+      { name: "Tosta Mista de Queijo Derretido", category: "snack", emoji: "🥪", desc: "Pão crocante com muito queijo a puxar." },
+      { name: "Batatas Fritas de Pacote", category: "snack", emoji: "🍟", desc: "O clássico snack salgado que nunca falha." },
+      { name: "Fruta Fresca com Mel", category: "snack", emoji: "🍎", desc: "Maçã ou banana cortada com um fio de mel." },
+      { name: "Nachos com Molho Cheddar", category: "snack", emoji: "🧀", desc: "Perfeito para acompanhar enquanto vês uma série." },
+      
+      { name: "Pizza Caseira de Frigideira", category: "jantar", emoji: "🍕", desc: "Rápida, com molho de tomate, fiambre e muito queijo." },
+      { name: "Hambúrguer Gourmet", category: "jantar", emoji: "🍔", desc: "Carne suculenta no pão brioche com alface e molho especial." },
+      { name: "Massa à Bolonhesa", category: "jantar", emoji: "🍝", desc: "Prato reconfortante com carne picada e tomilho." },
+      { name: "Wrap de Frango Crocante", category: "jantar", emoji: "🌯", desc: "Tortilha enrolada com frango panado, alface e maionese." },
+      { name: "Nuggets com Arroz e Salada", category: "jantar", emoji: "🍗", desc: "Uma refeição rápida e aconchegante." },
+
+      { name: "Gelado de Chocolate", category: "doce", emoji: "🍨", desc: "Cremoso, fresco e perfeito para qualquer altura." },
+      { name: "Panquecas com xarope de ácer", category: "doce", emoji: "🥞", desc: "Fofinhas e regadas com doce ou chocolate." },
+      { name: "Chocolate com Biscoito", category: "doce", emoji: "🍫", desc: "Um quadradinho (ou dois) de chocolate para matar o desejo." },
+      { name: "Pipocas Doces Caramelizadas", category: "doce", emoji: "🍿", desc: "Crocantes e docinhas." }
+    ];
+
+    let currentCategory = 'all';
+
+    function setCategory(category, buttonElement) {
+      currentCategory = category;
+      
+      // Atualizar estilo dos botões de filtro
+      const buttons = document.querySelectorAll('.filter-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      buttonElement.classList.add('active');
+    }
+
+    function sortearComida() {
+      const card = document.getElementById('foodCard');
+      const emojiEl = document.getElementById('foodEmoji');
+      const nameEl = document.getElementById('foodName');
+      const descEl = document.getElementById('foodDesc');
+
+      // Adicionar animação de tremor
+      card.classList.add('shake');
+      nameEl.textContent = "A sortear...";
+      descEl.textContent = "A agitar a cozinha digital...";
+      emojiEl.textContent = "🎲";
+
+      setTimeout(() => {
+        // Filtrar com base na categoria selecionada
+        let filteredFoods = foods;
+        if (currentCategory !== 'all') {
+          filteredFoods = foods.filter(f => f.category === currentCategory);
+        }
+
+        // Escolher aleatoriamente
+        const randomIndex = Math.floor(Math.random() * filteredFoods.length);
+        const selected = filteredFoods[randomIndex];
+
+        // Atualizar o ecrã com o resultado
+        emojiEl.textContent = selected.emoji;
+        nameEl.textContent = selected.name;
+        descEl.textContent = selected.desc;
+
+        // Remover a animação para poder repetir
+        card.classList.remove('shake');
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>
